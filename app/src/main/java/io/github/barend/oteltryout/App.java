@@ -4,6 +4,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
@@ -63,10 +64,28 @@ public class App {
                 .startSpan();
 
         try (var ignored = rootSpan.makeCurrent()) {
-            long sleepTime = 125L + (long)(new Random().nextDouble() * 250L);
-            Thread.sleep(sleepTime);
+            sleep(125L, 250L);
+            var nestedSpan = tracer.spanBuilder("testNest")
+                    .setSpanKind(SpanKind.CLIENT)
+                    .setAttribute(SemanticAttributes.RPC_METHOD, "sleep")
+                    .startSpan();
+            try (var ignored2 = nestedSpan.makeCurrent()) {
+                sleep(425L, 250L);
+                nestedSpan.setStatus(random.nextBoolean() ? StatusCode.OK : StatusCode.ERROR);
+                nestedSpan.end();
+            }
+            sleep(125L, 125L);
+
             rootSpan.end();
             logger.info("Finished OK.");
+        }
+    }
+
+    private static final Random random = new Random();
+    private static void sleep(long base, long fuzz) {
+        try {
+            long sleepTime = base + (long)(random.nextDouble() * fuzz);
+            Thread.sleep(sleepTime);
         } catch (InterruptedException ingored) {
             // ignored
         }
