@@ -53,3 +53,12 @@ docker run --rm \
            -p "4317:4317" \
            otel/opentelemetry-collector-contrib:0.72.0
 ```
+
+# Clean Up
+
+Disable the service account key:
+
+```sh
+gcloud iam service-accounts keys disable "$(jq -r .private_key_id otel-collector-sa.json)" \
+    --iam-account="otel-collector-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+```
