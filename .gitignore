@@ -1,4 +1,5 @@
 .idea/
+.bsp/
 *.iml
 .DS_Store
 target/
