@@ -1,0 +1,35 @@
+---
+# Configures the collector-contrib to export to GCP.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 65
+    spike_limit_percentage: 20
+  batch:
+  resourcedetection:
+    detectors:
+      - gcp
+    timeout: 10s
+
+exporters:
+  googlecloud:
+    retry_on_failure:
+      enabled: false
+    log:
+      default_log_name: opentelemetry.io/collector-exported-log
+
+service:
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - batch
+      exporters:
+        - googlecloud
