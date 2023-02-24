@@ -15,7 +15,9 @@ repositories {
 dependencies {
     // This dependency is used by the application.
     implementation("io.opentelemetry:opentelemetry-api:1.23.1")
+    implementation("io.opentelemetry:opentelemetry-sdk:1.23.1")
     implementation("io.opentelemetry:opentelemetry-semconv:1.23.1-alpha")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.23.1")
 }
 
 testing {
