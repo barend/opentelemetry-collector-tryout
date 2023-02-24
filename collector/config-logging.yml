@@ -1,0 +1,24 @@
+---
+# Configures the collector to simply dump everything to stdout.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+processors:
+
+exporters:
+  logging:
+    # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/loggingexporter
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 1
+
+service:
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors: []
+      exporters:
+        - logging
